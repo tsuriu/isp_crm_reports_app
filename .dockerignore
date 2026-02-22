@@ -1,0 +1,19 @@
+# Exclude from all Docker images
+.git
+.gitignore
+.dockerignore
+.vscode
+.idea
+README.md
+docker-compose.yml
+
+# Backend specific to ignore at root (if context is root)
+backend/data/
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Sensitive data
+.env
+data/
