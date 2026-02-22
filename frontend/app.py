@@ -96,6 +96,18 @@ with st.sidebar:
         except Exception:
             pass
 
+    st.markdown("---")
+    with st.expander("📉 Definições de Status"):
+        st.markdown("""
+        Para facilitar a cobrança estratégica, o painel categoriza os clientes com base no atraso e status no IXC:
+        
+        - 🟢 **Em Dia**: Pagamentos realizados ou faturas ainda não vencidas.
+        - 🟡 **Vencimento Padrão**: 1 a 6 dias de atraso. Janela de "lembrete".
+        - 🟠 **Transição**: 7 a 9 dias de atraso. Janela crítica para gestão de suspensão.
+        - 🔴 **Crônico**: Mais de 9 dias de atraso. Contas de alto risco.
+        - 🔵 **Desbloqueio de Confiança**: Clientes com desbloqueio ativo no IXC.
+        """)
+
 # Lógica de Busca de Dados (Cache)
 @st.cache_data(ttl=settings.CACHE_TTL, show_spinner="Buscando dados mais recentes da API IXC...")
 def fetch_report_data(start_str, end_str, refresh=False):
@@ -282,31 +294,7 @@ if st.session_state.report_data:
                     st.info("Nenhum registro em aberto encontrado para esta data.")
         else:
             st.info("👆 Selecione uma data de vencimento no gráfico acima para ver os detalhes")
-            
-    #     # Opções de Exportação
-    #     st.markdown("---")
-    #     st.subheader("📥 Exportar Relatórios")
-    #     exp_col1, exp_col2 = st.columns(2)
-        
-    #     md_content = ReportExporter.to_markdown(report_data)
-    #     html_content = ReportExporter.to_html(report_data)
-        
-    #     with exp_col1:
-    #         st.download_button(
-    #             label="Baixar Relatório Completo (Markdown)",
-    #             data=md_content,
-    #             file_name=f"relatorio_inadimplencia_{datetime.now().strftime('%Y%m%d')}.md",
-    #             mime="text/markdown"
-    #         )
-    #     with exp_col2:
-    #         st.download_button(
-    #             label="Baixar Relatório Completo (HTML)",
-    #             data=html_content,
-    #             file_name=f"relatorio_inadimplencia_{datetime.now().strftime('%Y%m%d')}.html",
-    #             mime="text/html"
-    #         )
-    # else:
-    #     st.warning("No delinquency data available for this range.")
+
 # Tratar Tela de Boas-vindas
 else:
     st.write("### Bem-vindo à Plataforma de Relatórios IXC!")
