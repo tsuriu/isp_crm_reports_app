@@ -214,6 +214,9 @@
                                             card.style.display = 'none';
                                         }
 
+                                        // Click handler: open details modal
+                                        card.addEventListener('click', () => openDetailsModal(dateLabel));
+
                                         container.appendChild(card);
                                     });
 
@@ -244,6 +247,88 @@
 
                             // Reload every 20 minutes (1,200,000 milliseconds)
                             setInterval(loadData, 20 * 60 * 1000);
+
+                            // ─── Details Modal ───────────────────────────────────
+                            const STATUS_LABELS = {
+                                em_dia: { label: 'Pago', color: '#22c55e' },
+                                vencimento_padrao: { label: 'Atrasado', color: '#eab308' },
+                                transicao: { label: 'Bloqueado', color: '#f97316' },
+                                cronico: { label: 'Poss. Cancelamento', color: '#ef4444' },
+                                desbloqueio_confianca: { label: 'Desbloqueio Confiança', color: '#3b82f6' },
+                            };
+
+                            const CONN_LABELS = {
+                                A: { label: 'Ativo', color: '#22c55e' },
+                                FA: { label: 'Bloq. Financeiro', color: '#f97316' },
+                                FS: { label: 'Bloq. Suporte', color: '#ef4444' },
+                                AA: { label: 'Ativo (AA)', color: '#22c55e' },
+                                CA: { label: 'Cancelado', color: '#94a3b8' },
+                            };
+
+                            async function openDetailsModal(dateLabel) {
+                                const modal = document.getElementById('details-modal');
+                                const title = document.getElementById('modal-title');
+                                const loading = document.getElementById('modal-loading');
+                                const errorEl = document.getElementById('modal-error');
+                                const tbody = document.getElementById('modal-tbody');
+
+                                title.innerText = `Detalhes — ${dateLabel}`;
+                                loading.classList.remove('hidden');
+                                errorEl.classList.add('hidden');
+                                tbody.innerHTML = '';
+                                modal.classList.remove('hidden');
+                                document.body.classList.add('overflow-hidden');
+
+                                // Convert dd-mm-yyyy → date param accepted by the API
+                                try {
+                                    const url = `/api/detalhes?date=${dateLabel}`;
+                                    const resp = await fetch(url);
+                                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                                    const rows = await resp.json();
+
+                                    loading.classList.add('hidden');
+
+                                    if (!rows.length) {
+                                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">Nenhum boleto em aberto para esta data.</td></tr>';
+                                        return;
+                                    }
+
+                                    rows.forEach(r => {
+                                        const st = STATUS_LABELS[r.status] || { label: r.status, color: '#94a3b8' };
+                                        const conn = CONN_LABELS[r['Status da Conexão']] || { label: r['Status da Conexão'] || '—', color: '#94a3b8' };
+                                        const tr = document.createElement('tr');
+                                        tr.className = 'border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors';
+                                        tr.innerHTML = `
+                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold text-white" style="background:${st.color}">
+                                                        ${st.label}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-sm font-medium text-slate-800 dark:text-slate-200">${r['Nome do Cliente'] || '—'}</td>
+                                                <td class="px-4 py-3 text-sm text-center font-bold ${r['Dias de Atraso'] > 0 ? 'text-red-500' : 'text-emerald-500'}">${r['Dias de Atraso'] ?? '—'}</td>
+                                                <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">${r['Telefone'] || '—'}</td>
+                                                <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">${r['Bairro'] || '—'}</td>
+                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold text-white" style="background:${conn.color}">
+                                                        ${conn.label}
+                                                    </span>
+                                                </td>
+                                            `;
+                                        tbody.appendChild(tr);
+                                    });
+
+                                } catch (err) {
+                                    loading.classList.add('hidden');
+                                    errorEl.classList.remove('hidden');
+                                    errorEl.innerText = `Erro ao carregar detalhes: ${err.message}`;
+                                    console.error(err);
+                                }
+                            }
+
+                            function closeDetailsModal() {
+                                document.getElementById('details-modal').classList.add('hidden');
+                                document.body.classList.remove('overflow-hidden');
+                            }
                         </script>
                     </div>
                 </div>
@@ -254,6 +339,62 @@
             <p>© 2026 TsuriuTech - Dashboard de Distribuição Financeira</p>
         </footer>
     </div>
+
+    <!-- ─── Details Modal ─────────────────────────────────── -->
+    <div id="details-modal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div
+            class="relative w-full max-w-5xl max-h-[90vh] flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-slate-100">Detalhes</h3>
+                <button id="modal-close"
+                    class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <!-- Loading / Error -->
+            <div id="modal-loading" class="flex items-center justify-center py-16 text-slate-400 gap-3">
+                <span class="material-symbols-outlined animate-spin">progress_activity</span>
+                <span class="text-sm">Carregando...</span>
+            </div>
+            <div id="modal-error" class="hidden px-6 py-4 text-sm text-red-500"></div>
+            <!-- Table -->
+            <div class="overflow-auto flex-1">
+                <table class="w-full text-left text-sm">
+                    <thead
+                        class="sticky top-0 bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
+                        <tr>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Cliente</th>
+                            <th class="px-4 py-3 text-center">Dias Atraso</th>
+                            <th class="px-4 py-3">Telefone</th>
+                            <th class="px-4 py-3">Bairro</th>
+                            <th class="px-4 py-3">Conexão</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Attach modal event listeners after DOM is parsed
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalClose = document.getElementById('modal-close');
+            const detailsModal = document.getElementById('details-modal');
+
+            if (modalClose) {
+                modalClose.addEventListener('click', closeDetailsModal);
+            }
+            if (detailsModal) {
+                detailsModal.addEventListener('click', e => {
+                    if (e.target === e.currentTarget) closeDetailsModal();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

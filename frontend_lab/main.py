@@ -28,7 +28,13 @@ async def get_metrics(view: str = "total"):
 
 @app.get("/api/details")
 async def get_details(date: str):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(f"{API_BASE_URL}/financial/detalhes", params={"date": date})
+        return response.json()
+
+@app.get("/api/detalhes")
+async def get_detalhes(date: str):
+    async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(f"{API_BASE_URL}/financial/detalhes", params={"date": date})
         return response.json()
 
