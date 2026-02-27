@@ -17,4 +17,5 @@ COPY . .
 EXPOSE 8501
 
 # Run the application
-CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+# CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+CMD ["streamlit", "run", "echarts_app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]

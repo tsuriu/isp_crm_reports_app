@@ -37,7 +37,7 @@ class Settings:
     API_HTTP_TIMEOUT = get_env_int("API_HTTP_TIMEOUT", 300)
     
     # API Configuration
-    API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+    API_BASE_URL = os.getenv("API_BASE_URL", "http://backend:8000")
     
     # App Settings
     APP_NAME = "IXC Reporting Platform"

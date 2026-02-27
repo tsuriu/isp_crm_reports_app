@@ -7,7 +7,6 @@ from typing import List, Dict, Any, Optional
 from loguru import logger
 from datetime import datetime, timedelta
 
-from utils.persistent_cache import PersistentCache
 from config.settings import settings
 
 class IxcClient:
@@ -39,11 +38,6 @@ class IxcClient:
         self.last_request_time = 0
         self.min_delay = 0.1  # 100ms
         
-        # Initialize Persistent Cache
-        self.pcache = PersistentCache(
-            settings.PERSISTENT_CACHE_PATH, 
-            settings.PERSISTENT_CACHE_TTL_HOURS
-        )
         
         logger.info(f"Initialized IxcClient for {self.base_url}")
 
@@ -57,12 +51,12 @@ class IxcClient:
             "Content-Type": "application/json"
         }
 
-    def _rate_limit(self):
-        """Simple rate limiting to avoid hitting API thresholds."""
+    async def _rate_limit(self):
+        """Non-blocking rate limiting to avoid hitting API thresholds."""
         now = time.time()
         elapsed = now - self.last_request_time
         if elapsed < self.min_delay:
-            time.sleep(self.min_delay - elapsed)
+            await asyncio.sleep(self.min_delay - elapsed)
         self.last_request_time = time.time()
 
     async def _fetch_page(self, endpoint: str, query_params: Dict[str, Any], page: int) -> Dict[str, Any]:
@@ -72,7 +66,7 @@ class IxcClient:
         if 'rp' not in params:
             params['rp'] = str(self.default_page_size)
             
-        self._rate_limit()
+        await self._rate_limit()
         url = f"{self.base_url}/webservice/v1/{endpoint}"
         
         try:
@@ -85,18 +79,7 @@ class IxcClient:
             return {}
 
     async def list_all(self, endpoint: str, query_params: Dict[str, Any], refresh: bool = False) -> List[Dict[str, Any]]:
-        """Fetch all records for a given endpoint using pagination, with persistent caching."""
-        # TTL Logic:
-        # - if refresh=True (button pressed): use 1 minute debounce
-        # - if refresh=False (default): use settings.CACHE_TTL (1 hour)
-        ttl_override = 60 if refresh else settings.CACHE_TTL
-        
-        cached_data = self.pcache.get(endpoint, query_params, ttl_seconds=ttl_override)
-        if cached_data is not None:
-            trigger = "Refresh Debounce" if refresh else "Hourly Cache"
-            logger.info(f"Using {trigger} for {endpoint}")
-            return cached_data
-
+        # Fetching always from API now, caching is handled by the sync process
         all_records = []
         page = 1
         total_records = None
@@ -117,10 +100,6 @@ class IxcClient:
                 break
             
             page += 1
-        
-        # 2. Store in persistent cache
-        if all_records:
-            self.pcache.set(endpoint, all_records, query_params)
                 
         logger.success(f"Fetched {len(all_records)} total records from {endpoint}")
         return all_records
@@ -130,9 +109,9 @@ class IxcClient:
     async def list_customers(self, refresh: bool = False) -> List[Dict[str, Any]]:
         """List all customers (PF/PJ), excluding filial 3."""
         params = {
-            "qtype": "cliente.id",
-            "query": "0",
-            "oper": ">",
+            "qtype": "cliente.ativo",
+            "query": "S",
+            "oper": "=",
             "sortname": "cliente.id",
             "sortorder": "asc",
             "grid_param": json.dumps([
@@ -169,7 +148,7 @@ class IxcClient:
             "sortorder": "asc",
             "grid_param": json.dumps([
                 {"TB": "fn_areceber.liberado", "OP": "=", "P": "S"},
-                {"TB": "fn_areceber.status", "OP": "=", "P": "A"},
+                # {"TB": "fn_areceber.status", "OP": "=", "P": "A"},
                 {"TB": "fn_areceber.filial_id", "OP": "!=", "P": "3"},
                 {"TB": "fn_areceber.data_vencimento", "OP": ">", "P": start_str}
             ])

@@ -10,29 +10,63 @@ services:
       - IXC_USER_ID=${IXC_USER_ID}
       - IXC_PAGE_SIZE=${IXC_PAGE_SIZE}
       - IXC_CACHE_TTL=${IXC_CACHE_TTL}
+      - IXC_REPORT_DAYS=${IXC_REPORT_DAYS}
+      - IXC_HTTP_TIMEOUT=${IXC_HTTP_TIMEOUT}
       - IXC_DATA_CACHE_TTL_HOURS=${IXC_DATA_CACHE_TTL_HOURS}
       - IXC_DATA_CACHE_PATH=/app/data/cache.json
+      - API_BASE_URL=${API_BASE_URL}
       - DEBUG=${DEBUG}
     volumes:
       - ./backend/data:/app/data
     restart: unless-stopped
 
-  frontend:
-    build: ./frontend
-    container_name: ixc-reporting-frontend
+  # frontend:
+  #   build: ./frontend
+  #   container_name: ixc-reporting-frontend
+  #   ports:
+  #     - "8502:8501"
+  #   environment:
+  #     - API_BASE_URL=${API_BASE_URL:-http://backend:8000}
+  #     - IXC_REPORT_DAYS=${IXC_REPORT_DAYS}
+  #     - IXC_CACHE_TTL=${IXC_CACHE_TTL}
+  #     - API_HTTP_TIMEOUT=${API_HTTP_TIMEOUT}
+  #     - DEBUG=${DEBUG}
+  #     - STREAMLIT_SERVER_PORT=8501
+  #     - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+  #     - STREAMLIT_BROWSER_SERVER_PORT=8502
+  #     - STREAMLIT_BROWSER_SERVER_ADDRESS=localhost
+  #     - STREAMLIT_SERVER_HEADLESS=true
+  #     - STREAMLIT_SERVER_ENABLE_CORS=false
+  #     - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
+  #     - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+  #     - STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+
+  frontend-lab:
+    build: ./frontend_lab
+    container_name: ixc-reporting-frontend-lab
     ports:
-      - "8502:8501"
-    environment:
-      - API_BASE_URL=http://backend:8000
-      - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
-      - STREAMLIT_BROWSER_SERVER_PORT=8502
-      - STREAMLIT_BROWSER_SERVER_ADDRESS=localhost
-      - STREAMLIT_SERVER_HEADLESS=true
-      - STREAMLIT_SERVER_ENABLE_CORS=false
-      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
-      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
-      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
+      - "8080:8080"
     depends_on:
       - backend
+    volumes:
+      - ./frontend_lab:/app
     restart: unless-stopped
+
+  # grafana:
+  #   image: grafana/grafana-oss
+  #   container_name: ixc-reporting-grafana
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+  #     - GF_USERS_ALLOW_SIGN_UP=false
+  #     - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+  #   volumes:
+  #     - grafana-storage:/var/lib/grafana
+  #   restart: unless-stopped
+
+volumes:
+  grafana-storage:

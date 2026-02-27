@@ -27,18 +27,19 @@ class Settings:
         }
     }
     
-    # Caching
-    CACHE_TTL = get_env_int("IXC_CACHE_TTL", 3600) # Default 1 hour
-    
-    # Reports
+    # Sincronização e Métricas
+    SYNC_INTERVAL_MINUTES = get_env_int("IXC_SYNC_INTERVAL_MINUTES", 30)
+    SYNC_CUSTOMERS_HOUR = get_env_int("IXC_SYNC_CUSTOMERS_HOUR", 7)
     REPORT_DAYS = get_env_int("IXC_REPORT_DAYS", 45)
     
     # Timeouts
     HTTP_TIMEOUT = get_env_int("IXC_HTTP_TIMEOUT", 120)
     
-    # Persistent Caching (TinyDB)
-    PERSISTENT_CACHE_TTL_HOURS = get_env_int("IXC_DATA_CACHE_TTL_HOURS", 24)
-    PERSISTENT_CACHE_PATH = os.getenv("IXC_DATA_CACHE_PATH", "data/cache.json")
+    # Storage Paths (TinyDB)
+    
+    STORAGE_PATH_CLIENTES = os.getenv("IXC_STORAGE_PATH_CLIENTES", "data/clientes.json")
+    STORAGE_PATH_CONTRATOS = os.getenv("IXC_STORAGE_PATH_CONTRATOS", "data/contratos.json")
+    STORAGE_PATH_BOLETOS = os.getenv("IXC_STORAGE_PATH_BOLETOS", "data/boletos.json")
     
     # API Configuration
     API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")

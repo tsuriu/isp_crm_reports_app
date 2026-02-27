@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard de Distribuição Financeira</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 lg:px-10">
+            <div class="flex items-center gap-4">
+                <div class="text-primary">
+                    <span class="material-symbols-outlined text-3xl">account_balance</span>
+                </div>
+                <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">
+                    Dashboard de Distribuição Financeira</h2>
+            </div>
+        </header>
+        <main class="flex-1 p-6 lg:p-10 space-y-8">
+            <div class="max-w-[1440px] mx-auto space-y-8">
+                <div class="flex flex-col gap-2">
+                    <h1 id="page-title" class="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                        Resumo do Período
+                    </h1>
+                    <p class="text-slate-500 dark:text-slate-400">Visão geral da saúde financeira monitorada
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Volume Total</p>
+                        <p id="stat-total" class="text-2xl font-bold">...</p>
+                        <p class="text-emerald-500 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">trending_up</span>N/A</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 border-l-4 border-l-[#22c55e]">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pago</p>
+                        <p id="stat-pagos" class="text-2xl font-bold">...</p>
+                        <p class="text-rose-500 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">trending_down</span>N/A</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 border-l-4 border-l-[#eab308]">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Atrasado</p>
+                        <p id="stat-atrasados" class="text-2xl font-bold">...</p>
+                        <p class="text-rose-500 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">trending_down</span>N/A</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 border-l-4 border-l-[#f97316]">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Bloqueado</p>
+                        <p id="stat-bloqueados" class="text-2xl font-bold">...</p>
+                        <p class="text-slate-400 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">horizontal_rule</span>N/A</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 border-l-4 border-l-[#ef4444]">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Possível Cancelamento</p>
+                        <p id="stat-canc" class="text-2xl font-bold">...</p>
+                        <p class="text-rose-500 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">trending_down</span>N/A</p>
+                    </div>
+                    <div
+                        class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 border-l-4 border-l-[#3b82f6]">
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Desbloqueio de Confiança</p>
+                        <p id="stat-trust" class="text-2xl font-bold">...</p>
+                        <p class="text-emerald-500 text-sm font-semibold flex items-center gap-1"><span
+                                class="material-symbols-outlined text-xs">trending_up</span>N/A</p>
+                    </div>
+                </div>
+                <div class="pt-6 border-t border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Distribuição de Status Diários
+                        </h2>
+                        <div class="flex gap-4">
+                            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span class="w-3 h-3 rounded-full bg-[#22c55e]"></span> Pago
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span class="w-3 h-3 rounded-full bg-[#eab308]"></span> Atrasado
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span class="w-3 h-3 rounded-full bg-[#f97316]"></span> Bloqueado
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> Possível Cancelamento
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+                                <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> Desbloqueio Confiança
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mb-4">
+                        <button id="toggle-pago-cards"
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <span class="material-symbols-outlined text-[16px]">visibility_off</span>
+                            <span id="toggle-pago-text">Mostrar 100% Pagos</span>
+                        </button>
+                    </div>
+                    <div id="daily-grid"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                        <script>
+                            async function loadData() {
+                                try {
+                                    // 1. Buscar Resumo
+                                    const summaryResp = await fetch('/api/metrics?view=total');
+                                    const summary = await summaryResp.json();
+
+                                    // Usar total_boletos e acessar campos de status aninhados
+                                    const totalNum = summary.total_boletos || 0;
+                                    const sSum = summary.status || {};
+                                    const reportDays = summary.report_days || 0;
+
+                                    if (reportDays > 0) {
+                                        document.getElementById('page-title').innerText = `Resumo do Período (${reportDays} dias)`;
+                                    }
+
+                                    document.getElementById('stat-total').innerText = totalNum.toLocaleString();
+                                    document.getElementById('stat-pagos').innerText = (sSum.em_dia || 0).toLocaleString();
+                                    document.getElementById('stat-atrasados').innerText = (sSum.vencimento_padrao || 0).toLocaleString();
+                                    document.getElementById('stat-bloqueados').innerText = (sSum.transicao || 0).toLocaleString();
+                                    document.getElementById('stat-canc').innerText = (sSum.cronico || 0).toLocaleString();
+                                    document.getElementById('stat-trust').innerText = (sSum.desbloqueio_confianca || 0).toLocaleString();
+
+                                    // 2. Buscar Distribuição Diária
+                                    const dailyResp = await fetch('/api/metrics?view=by_date');
+                                    const dailyData = await dailyResp.json();
+
+                                    const container = document.getElementById('daily-grid');
+                                    container.innerHTML = ''; // Limpar loaders
+
+                                    // Store cards data globally to allow filtering without refetching
+                                    window.allDailyCardsData = [];
+
+                                    dailyData.forEach(item => {
+                                        const dateLabel = item.date;
+                                        const s = item.status;
+                                        const total = item.total_boletos || (s.em_dia + s.vencimento_padrao + s.transicao + s.cronico + s.desbloqueio_confianca);
+                                        const is100PercentPago = total > 0 && total === s.em_dia;
+
+                                        // Percentuais para o gradiente cônico
+                                        const sumForPercent = s.em_dia + s.vencimento_padrao + s.transicao + s.cronico + s.desbloqueio_confianca;
+                                        const pPagos = sumForPercent > 0 ? (s.em_dia / sumForPercent) * 100 : 0;
+                                        const pAtras = sumForPercent > 0 ? (s.vencimento_padrao / sumForPercent) * 100 : 0;
+                                        const pBloq = sumForPercent > 0 ? (s.transicao / sumForPercent) * 100 : 0;
+                                        const pCanc = sumForPercent > 0 ? (s.cronico / sumForPercent) * 100 : 0;
+                                        const pDesc = sumForPercent > 0 ? (s.desbloqueio_confianca / sumForPercent) * 100 : 0;
+
+                                        const card = document.createElement('div');
+                                        card.className = "bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors group cursor-pointer";
+                                        card.innerHTML = `
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div>
+                                                    <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm whitespace-nowrap">${dateLabel}</h3>
+                                                    <p class="text-[10px] text-slate-500 font-medium">Total: ${total.toLocaleString()}</p>
+                                                </div>
+                                                <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-sm">calendar_today</span>
+                                            </div>
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex-1 flex items-center justify-center">
+                                                    <div class="relative w-24 h-24 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800" 
+                                                         style="background: ${sumForPercent > 0 ? `conic-gradient(#22c55e 0% ${pPagos}%, #eab308 ${pPagos}% ${pPagos + pAtras}%, #f97316 ${pPagos + pAtras}% ${pPagos + pAtras + pBloq}%, #ef4444 ${pPagos + pAtras + pBloq}% ${pPagos + pAtras + pBloq + pCanc}%, #3b82f6 ${pPagos + pAtras + pBloq + pCanc}% 100%)` : '#e2e8f0'};">
+                                                        <div class="w-14 h-14 rounded-full bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-inner">
+                                                            <span class="text-[8px] text-slate-400 uppercase font-black">Pago</span>
+                                                            <span class="text-[10px] font-bold">${Math.round(pPagos)}%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col gap-1.5 text-[10px] text-slate-500 font-medium py-1">
+                                                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#22c55e]"></span> Pago: ${s.em_dia.toLocaleString()}</div>
+                                                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#eab308]"></span> Atrasado: ${s.vencimento_padrao.toLocaleString()}</div>
+                                                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#f97316]"></span> Bloqueado: ${s.transicao.toLocaleString()}</div>
+                                                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#ef4444]"></span> Canc. Possível: ${s.cronico.toLocaleString()}</div>
+                                                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#3b82f6]"></span> Desbloqueio: ${s.desbloqueio_confianca.toLocaleString()}</div>
+                                                </div>
+                                            </div>
+                                        `;
+
+                                        window.allDailyCardsData.push({
+                                            element: card,
+                                            is100PercentPago: is100PercentPago
+                                        });
+
+                                        // Apply default hidden state
+                                        if (is100PercentPago) {
+                                            card.style.display = 'none';
+                                        }
+
+                                        container.appendChild(card);
+                                    });
+
+                                    // Filter Toggle Logic
+                                    let hidePagosInfo = true; // Default state is hidden
+                                    const toggleBtn = document.getElementById('toggle-pago-cards');
+                                    const toggleText = document.getElementById('toggle-pago-text');
+                                    const toggleIcon = toggleBtn.querySelector('.material-symbols-outlined');
+
+                                    toggleBtn.addEventListener('click', () => {
+                                        hidePagosInfo = !hidePagosInfo;
+                                        toggleText.innerText = hidePagosInfo ? "Mostrar 100% Pagos" : "Ocultar 100% Pagos";
+                                        toggleIcon.innerText = hidePagosInfo ? "visibility_off" : "visibility";
+
+                                        window.allDailyCardsData.forEach(data => {
+                                            if (data.is100PercentPago) {
+                                                data.element.style.display = hidePagosInfo ? 'none' : 'block';
+                                            }
+                                        });
+                                    });
+
+                                } catch (e) {
+                                    console.error("Falha ao carregar dados do dashboard:", e);
+                                }
+                            }
+                            // Initial load
+                            loadData();
+
+                            // Reload every 20 minutes (1,200,000 milliseconds)
+                            setInterval(loadData, 20 * 60 * 1000);
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer
+            class="mt-auto py-6 border-t border-slate-200 dark:border-slate-800 px-10 text-center text-slate-400 text-sm">
+            <p>© 2026 TsuriuTech - Dashboard de Distribuição Financeira</p>
+        </footer>
+    </div>
+</body>
+
+</html>
