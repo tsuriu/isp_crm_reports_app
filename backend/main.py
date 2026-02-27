@@ -255,7 +255,9 @@ async def get_bill_details(date: str):
         if customers_data:
             df_cust = pd.DataFrame(customers_data)
             if 'id' in df_cust.columns and 'razao' in df_cust.columns:
-                cust_map = df_cust.set_index('id')['razao'].to_dict()
+                cust_map = df_cust.set_index('id')['razao'].apply(str).to_dict() # ensure values are strings
+                # Actually we need keys to be strings
+                cust_map = {str(k): v for k, v in df_cust.set_index('id')['razao'].to_dict().items()}
                 df_filtered['cliente_nome'] = df_filtered['id_cliente'].astype(str).map(lambda x: cust_map.get(x, "Desconhecido"))
         
         # 4. Enrich with Internet Status and Trust Unlock
@@ -274,17 +276,17 @@ async def get_bill_details(date: str):
         if customers_data:
             df_cust = pd.DataFrame(customers_data)
             if 'id' in df_cust.columns:
-                phone_map = df_cust.set_index('id')['telefone_celular'].to_dict()
+                phone_map = {str(k): v for k, v in df_cust.set_index('id')['telefone_celular'].to_dict().items()}
                 # fallback to fone if celular is empty
-                fone_map = df_cust.set_index('id')['fone'].to_dict()
-                bairro_map = df_cust.set_index('id')['bairro'].to_dict()
+                fone_map = {str(k): v for k, v in df_cust.set_index('id')['fone'].to_dict().items()}
+                bairro_map = {str(k): v for k, v in df_cust.set_index('id')['bairro'].to_dict().items()}
                 
                 def get_phone(x):
-                    cel = phone_map.get(x, "")
-                    return cel if cel else fone_map.get(x, "")
+                    cel = phone_map.get(str(x), "")
+                    return cel if cel else fone_map.get(str(x), "")
                 
                 df_filtered['telefone'] = df_filtered['id_cliente'].astype(str).map(get_phone)
-                df_filtered['bairro'] = df_filtered['id_cliente'].astype(str).map(lambda x: bairro_map.get(x, ""))
+                df_filtered['bairro'] = df_filtered['id_cliente'].astype(str).map(lambda x: bairro_map.get(str(x), ""))
 
         # Calculate days_late exactly as in the inadiplencia endpoint
         today = pd.Timestamp.now().normalize()

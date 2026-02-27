@@ -109,14 +109,13 @@ class IxcClient:
     async def list_customers(self, refresh: bool = False) -> List[Dict[str, Any]]:
         """List all customers (PF/PJ), excluding filial 3."""
         params = {
-            "qtype": "cliente.ativo",
-            "query": "S",
-            "oper": "=",
+            "qtype": "cliente.id",
+            "query": "0",
+            "oper": ">",
             "sortname": "cliente.id",
             "sortorder": "asc",
             "grid_param": json.dumps([
                 {"TB": "cliente.id", "OP": "!=", "P": "1"},
-                {"TB": "cliente.tipo_pessoa", "OP": "!=", "P": "J"},
                 {"TB": "cliente.filial_id", "OP": "!=", "P": "3"}
             ])
         }
